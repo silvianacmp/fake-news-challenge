@@ -1,7 +1,3 @@
-from baseline.utils.dataset import DataSet
-from preprocesser import preprocess_dataset
-from embedder import bag_of_words
-
 DISCUSS = 'discuss'
 UNRELATED = 'unrelated'
 AGREE = 'agree'
@@ -35,15 +31,4 @@ def get_splits(dataset, train_split=0.9):
 
     print('Total train: {} \nTotal test: {}'.format(len(train_dataset), len(test_dataset)))
     return dataset.articles, train_dataset, test_dataset
-
-if __name__ == "__main__":
-    dataset = DataSet(name='train', path='data')
-    preprocess_dataset(dataset.articles, text_col='articleBody', tokens_col='article_tokens')
-    preprocess_dataset(dataset.stances, text_col='Headline', tokens_col='headline_tokens')
-    bag_of_words(dataset.articles, dataset.stances)
-
-    articles, train_dataset, test_dataset = get_splits(dataset, train_split=0.9)
-
-    print(articles[0])
-    print(train_dataset[0])
 
