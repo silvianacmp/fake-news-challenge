@@ -1,8 +1,9 @@
 import numpy as np
 from sklearn import datasets
+from sklearn.base import BaseEstimator
 
 
-class LogisticRegression:
+class LogisticRegression(BaseEstimator):
 
     def __init__(self, tol=1e-1):
         self.tol = tol
@@ -15,12 +16,14 @@ class LogisticRegression:
         :param logging:
         :return:
         """
+        if len(y.shape) == 1:
+            y = y.reshape((-1, 1))
+
         self.num_classes = len(np.unique(y))
         rng = 0
 
         if self.num_classes > 2:
             self._W = np.random.uniform(-rng, rng, size=(self.num_classes, X.shape[1], 1))
-            self._b = np.random.uniform(-rng, rng, size=(self.num_classes,))
 
             for i in range(self.num_classes):
                 y_cls = y.copy()
@@ -30,8 +33,9 @@ class LogisticRegression:
                 self._binary_fit(X, y_cls, i, logging)
         else:
             self._W = np.random.uniform(-rng, rng, size=(1, X.shape[1], 1))
-            self._b = np.random.uniform(-rng, rng, size=(1,))
             self._binary_fit(X, y, 0, logging)
+        # stored to  use with sklearn's feature selection methods
+        self.coef_ = np.reshape(self._W, (self.num_classes, -1))
 
     def _binary_fit(self, X, y, cls, logging=False):
         """
@@ -62,12 +66,13 @@ class LogisticRegression:
             self._W[cls] = W_old - delta
 
             if np.linalg.norm(self._W[cls] - W_old) < self.tol * np.linalg.norm(self._W[cls]):
-                loss = self.loss(y, pred)
-                pred = self._binary_predict(X, cls=cls)
-                pred = np.round(pred)
-                acc = np.mean(np.equal(y, pred))
-                print('Loss: {}'.format(loss))
-                print('Final Accuracy: {}'.format(acc))
+                if logging:
+                    loss = self.loss(y, pred)
+                    pred = self._binary_predict(X, cls=cls)
+                    pred = np.round(pred)
+                    acc = np.mean(np.equal(y, pred))
+                    print('Loss: {}'.format(loss))
+                    print('Final Accuracy: {}'.format(acc))
                 break
 
             if logging:

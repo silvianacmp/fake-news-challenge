@@ -1,8 +1,9 @@
 import numpy as np
 from sklearn import datasets
+from sklearn.base import BaseEstimator
 
 
-class LinearRegression:
+class LinearRegression(BaseEstimator):
 
     def __init__(self, learning_rate=0.1, tol=1e-5):
         self.learning_rate = learning_rate
@@ -15,6 +16,9 @@ class LinearRegression:
         :param y: Array of shape [n_samples, 1]
         :return:
         """
+        if len(y.shape) == 1:
+            y = y.reshape((-1, 1))
+
         X = X.transpose()
         y = y.transpose()
 
@@ -42,6 +46,8 @@ class LinearRegression:
 
         X = X.transpose()
         y = y.transpose()
+        # stored to  use with sklearn's feature selection methods
+        self.coef_ = np.reshape(self._W, (1, -1))
 
     def fit_closed_form(self, X, y):
         XX = X.transpose().dot(X)
