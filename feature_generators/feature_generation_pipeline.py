@@ -1,17 +1,17 @@
 import pandas as pd
 from baseline.utils.dataset import DataSet
-from dataset_splitter import get_splits
-from preprocesser import preprocess_dataset, lower
-from utils import *
-from bag_of_words_feature_generator import BagOfWordsFeatureGenerator
-from word2vec_feature_generator import Word2VecFeatureGenerator
-from tf_idf_feature_generator import TfIdfFeatureGenerator
-from svd_feature_generator import SvdFeatureGenerator
-from lda_feature_generator import LdaFeatureGenerator
-from word_embeddings_feature_generator import WordEmbeddingsFeatureGenerator
-from jelinek_mercer_lm_feature_generator import JelinekMercerLmFeatureGenerator
-from sentiment_feature_generator import SentimentFeatureGenerator
-from dirichlet_lm_feature_generator import DirichletLmFeatureGenerator
+from feature_generators.dataset_splitter import get_splits
+from feature_generators.preprocesser import preprocess_dataset, lower
+from feature_generators.utils import *
+from feature_generators.bag_of_words_feature_generator import BagOfWordsFeatureGenerator
+from feature_generators.word2vec_feature_generator import Word2VecFeatureGenerator
+from feature_generators.tf_idf_feature_generator import TfIdfFeatureGenerator
+from feature_generators.svd_feature_generator import SvdFeatureGenerator
+from feature_generators.lda_feature_generator import LdaFeatureGenerator
+from feature_generators.word_embeddings_feature_generator import WordEmbeddingsFeatureGenerator
+from feature_generators.jelinek_mercer_lm_feature_generator import JelinekMercerLmFeatureGenerator
+from feature_generators.sentiment_feature_generator import SentimentFeatureGenerator
+from feature_generators.dirichlet_lm_feature_generator import DirichletLmFeatureGenerator
 from nltk.corpus import stopwords
 
 if __name__ == "__main__":
@@ -36,10 +36,10 @@ if __name__ == "__main__":
                        ops=[lower],
                        stop_words=stopwords)
 
-    # bag_of_words = BagOfWordsFeatureGenerator()
-    # bag_of_words.process(articles, train_stances)
-    # bag_of_words.process(articles, test_stances)
-    #
+    bag_of_words = BagOfWordsFeatureGenerator()
+    bag_of_words.process(articles, train_stances)
+    bag_of_words.process(articles, test_stances)
+
     tf_idf = TfIdfFeatureGenerator(stop_words=list(stopwords))
     tf_idf.process(articles, train_stances)
     tf_idf.process(articles, test_stances)
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     word2vec.process(articles, train_stances)
     word2vec.process(articles, test_stances)
 
-    word_embeddings = WordEmbeddingsFeatureGenerator(path='./glove/glove.6B.100d.txt')
+    word_embeddings = WordEmbeddingsFeatureGenerator(path='../glove/glove.6B.100d.txt')
     word_embeddings.process(articles, train_stances)
     word_embeddings.process(articles, test_stances)
 
@@ -102,12 +102,13 @@ if __name__ == "__main__":
     cos_similarity(articles, test_stances, article_col='article_lda',
                    stance_col='headline_lda', similarity_col='cosine_lda')
 
-    features = ['Body ID', 'cosine_bow', 'cosine_tf_idf', 'cosine_embd_mean', 'cosine_word2vec_mean', 'cosine_lda',
+    features = ['id', 'Body ID', 'cosine_bow', 'cosine_tf_idf', 'cosine_embd_mean', 'cosine_word2vec_mean', 'cosine_lda',
                 'cosine_svd', 'kl_jelinek_mercer', 'kl_dirichlet', 'article_compound', 'article_neg', 'article_pos',
                 'article_neu', 'headline_compound', 'headline_neg', 'headline_pos', 'headline_neu', 'Stance']
 
     train_stances_df = pd.DataFrame(train_stances)
     test_stances_df = pd.DataFrame(test_stances)
 
-    train_stances_df[features].to_csv('train_stances_feats.df')
-    test_stances_df[features].to_csv('test_stances_feats.df')
+
+    train_stances_df[features].to_csv('train_stances_all_feats.df')
+    test_stances_df[features].to_csv('test_stances_all_feats.df')

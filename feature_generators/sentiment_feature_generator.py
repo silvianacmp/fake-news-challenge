@@ -1,5 +1,5 @@
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-from feature_generator import FeatureGenerator
+from feature_generators.feature_generator import FeatureGenerator
 from nltk.tokenize import sent_tokenize
 import pandas as pd
 

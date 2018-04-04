@@ -1,12 +1,13 @@
-from feature_generator import FeatureGenerator
-from tqdm import tqdm
+from feature_generators.feature_generator import FeatureGenerator
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
+from tqdm import tqdm
 
+class JelinekMercerLmFeatureGenerator(FeatureGenerator):
 
-class DirichletLmFeatureGenerator(FeatureGenerator):
-    def __init__(self):
+    def __init__(self, collection_prop=0.5):
         super().__init__()
+        self.collection_prop = collection_prop
         self.count_vectorizer = None
         self.collection_counts = None
 
@@ -21,20 +22,13 @@ class DirichletLmFeatureGenerator(FeatureGenerator):
         else:
             counts = self.count_vectorizer.transform(all)
 
+        normalized_counts = counts / np.sum(counts, axis=1)
+
         if self.collection_counts is None:
             self.collection_counts = np.sum(counts, axis=0) / np.sum(counts)
 
-        document_counts = np.sum(counts, axis=1)
-        normalized_counts = counts / document_counts
-        average_doc_length = np.broadcast_to(np.mean(document_counts), document_counts.shape)
-        denominator = document_counts + average_doc_length
-
-        doc_prop = np.broadcast_to(document_counts / denominator, normalized_counts.shape)
-        collection_prop = np.broadcast_to(average_doc_length / denominator, normalized_counts.shape)
-
-        final_counts = (np.multiply(doc_prop, normalized_counts)
-                        + np.multiply(collection_prop,
-                                      np.broadcast_to(self.collection_counts, normalized_counts.shape)))
+        final_counts = ((1 - self.collection_prop) * normalized_counts
+                        + self.collection_prop * np.broadcast_to(self.collection_counts, normalized_counts.shape))
 
         tmp_article_dict = {}
         for i, k in enumerate(articles.keys()):
@@ -44,4 +38,4 @@ class DirichletLmFeatureGenerator(FeatureGenerator):
             headline_prob = np.array(final_counts[i]).flatten()
             article_prob = np.array(final_counts[tmp_article_dict[stance['Body ID']]]).flatten()
             kl = -np.sum(headline_prob * np.log(article_prob / headline_prob))
-            stance['kl_dirichlet'] = kl
+            stance['kl_jelinek_mercer'] = kl

@@ -1,4 +1,4 @@
-from feature_generator import FeatureGenerator
+from feature_generators.feature_generator import FeatureGenerator
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 

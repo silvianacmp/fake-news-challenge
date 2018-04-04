@@ -1,5 +1,5 @@
 import numpy as np
-from feature_generator import FeatureGenerator
+from feature_generators.feature_generator import FeatureGenerator
 
 OOV = 'OOV'
 

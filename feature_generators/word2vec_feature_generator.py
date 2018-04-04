@@ -1,4 +1,4 @@
-from feature_generator import FeatureGenerator
+from feature_generators.feature_generator import FeatureGenerator
 import numpy as np
 import gensim
 
@@ -7,7 +7,7 @@ class Word2VecFeatureGenerator(FeatureGenerator):
 
     def __init__(self):
         super().__init__()
-        self.model = gensim.models.KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
+        self.model = gensim.models.KeyedVectors.load_word2vec_format('../word2vec/GoogleNews-vectors-negative300.bin', binary=True)
         print('Loaded word2vec model')
 
     def process(self, articles, stances):
